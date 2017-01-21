@@ -76,6 +76,7 @@ namespace ArenaSpawnProtection
                 SteamPlayer sPlayer = Provider.clients[i];
                 UnturnedPlayer uPlayer = (UnturnedPlayer)UnturnedPlayer.FromCSteamID(sPlayer.playerID.steamID);
                 uPlayer.Features.VanishMode = true;
+                uPlayer.Features.GodMode = true;
                 Rocket.Core.Logging.Logger.Log("Protected " + uPlayer.DisplayName, ConsoleColor.Cyan);
             }
             ChatManager.say(base.Configuration.Instance.ProtectionStartMessage, base.Configuration.Instance.MessageColor);
@@ -85,6 +86,7 @@ namespace ArenaSpawnProtection
                 SteamPlayer sPlayer = Provider.clients[i];
                 UnturnedPlayer uPlayer = (UnturnedPlayer)UnturnedPlayer.FromCSteamID(sPlayer.playerID.steamID);
                 uPlayer.Features.VanishMode = false;
+                uPlayer.Features.GodMode = false;
                 Rocket.Core.Logging.Logger.Log("Ended protection for " + uPlayer.DisplayName, ConsoleColor.Cyan);
             }
             ChatManager.say(base.Configuration.Instance.ProtectionEndMessage, base.Configuration.Instance.MessageColor);
