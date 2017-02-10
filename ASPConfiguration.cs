@@ -1,5 +1,4 @@
-﻿using System;
-using Rocket.API;
+﻿using Rocket.API;
 using UnityEngine;
 
 namespace ArenaSpawnProtection
@@ -8,13 +7,13 @@ namespace ArenaSpawnProtection
     {
         public void LoadDefaults()
         {
-            this.PlayerHideTime = 10f;
-            this.ProtectionStartMessage = "Players protected!";
-            this.ProtectionEndMessage = "Player protection ended!";
-            this.MessageColor = Color.cyan;
+            PlayerProtectionTime = 10f;
+            ProtectionStartMessage = "Players protected!";
+            ProtectionEndMessage = "Player protection ended!";
+            MessageColor = Color.cyan;
         }
 
-        public float PlayerHideTime;
+        public float PlayerProtectionTime;
         public string ProtectionStartMessage;
         public string ProtectionEndMessage;
         public Color MessageColor;

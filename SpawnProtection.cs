@@ -1,14 +1,10 @@
 ﻿using System;
 using Rocket.Unturned;
 using Rocket.Core.Plugins;
-using Rocket.Core.Logging;
-using Rocket.Unturned.Events;
 using Rocket.Unturned.Player;
 using SDG.Unturned;
 using UnityEngine;
-using Rocket.Core.Extensions;
 using System.Collections;
-using System.Diagnostics;
 
 namespace ArenaSpawnProtection
 {
@@ -18,13 +14,14 @@ namespace ArenaSpawnProtection
         {
             Instance = this;
             Rocket.Core.Logging.Logger.Log("\n\n\rArenaSpawnProtection made by ic3w0lf", ConsoleColor.Green);
-            Rocket.Core.Logging.Logger.Log(string.Format("\r\rPlayer Hide Time: {0} seconds\n\n", base.Configuration.Instance.PlayerHideTime), ConsoleColor.Green);
-            U.Events.OnPlayerConnected += new UnturnedEvents.PlayerConnected(ProtectPlayerConnected);
+            Rocket.Core.Logging.Logger.Log(string.Format("\r\rPlayer Protection Time: {0} seconds\n\n", Instance.Configuration.Instance.PlayerProtectionTime), ConsoleColor.Green);
+            U.Events.OnPlayerConnected += ProtectPlayerConnected;
             StartCoroutine(CheckArenaState());
         }
+
         protected override void Unload()
         {
-            U.Events.OnPlayerConnected -= new UnturnedEvents.PlayerConnected(ProtectPlayerConnected);
+            U.Events.OnPlayerConnected -= ProtectPlayerConnected;
             StopAllCoroutines();
         }
 
@@ -32,18 +29,18 @@ namespace ArenaSpawnProtection
         {
             if (LevelManager.arenaState == EArenaState.WARMUP)
             {
-                player.Features.VanishMode = true;
+                if (!player.Features.VanishMode)
+                    player.Features.VanishMode = true;
             }
         }
 
-        [DebuggerHidden()]
         public IEnumerator CheckArenaState()
         {
             while (true)
             {
                 if (Provider.isServer)
                 {
-                    switch(LevelManager.arenaState)
+                    switch (LevelManager.arenaState)
                     {
                         case EArenaState.WARMUP:
                             {
@@ -64,37 +61,39 @@ namespace ArenaSpawnProtection
                             }
                     }
                 }
-                yield return new WaitForSeconds(.05f);
+                yield return new WaitForSeconds(1f);
             }
         }
 
-        [DebuggerHidden()]
         public IEnumerator ProtectPlayers()
         {
             for (int i = 0; i < Provider.clients.Count; i++)
             {
-                SteamPlayer sPlayer = Provider.clients[i];
-                UnturnedPlayer uPlayer = (UnturnedPlayer)UnturnedPlayer.FromCSteamID(sPlayer.playerID.steamID);
-                uPlayer.Features.VanishMode = true;
-                uPlayer.Features.GodMode = true;
+                UnturnedPlayer uPlayer = (UnturnedPlayer)UnturnedPlayer.FromCSteamID(Provider.clients[i].playerID.steamID);
+                if (!uPlayer.Features.VanishMode)
+                    uPlayer.Features.VanishMode = true;
+                if (!uPlayer.Features.GodMode)
+                    uPlayer.Features.GodMode = true;
                 Rocket.Core.Logging.Logger.Log("Protected " + uPlayer.DisplayName, ConsoleColor.Cyan);
             }
-            ChatManager.say(base.Configuration.Instance.ProtectionStartMessage, base.Configuration.Instance.MessageColor);
-            yield return new WaitForSeconds(base.Configuration.Instance.PlayerHideTime + 5f);
+            ChatManager.say(Instance.Configuration.Instance.ProtectionStartMessage, Instance.Configuration.Instance.MessageColor);
+            yield return new WaitForSeconds(Instance.Configuration.Instance.PlayerProtectionTime + 5f);
             for (int i = 0; i < Provider.clients.Count; i++)
             {
-                SteamPlayer sPlayer = Provider.clients[i];
-                UnturnedPlayer uPlayer = (UnturnedPlayer)UnturnedPlayer.FromCSteamID(sPlayer.playerID.steamID);
-                uPlayer.Features.VanishMode = false;
-                uPlayer.Features.GodMode = false;
+                UnturnedPlayer uPlayer = (UnturnedPlayer)UnturnedPlayer.FromCSteamID(Provider.clients[i].playerID.steamID);
+                if (uPlayer.Features.VanishMode)
+                    uPlayer.Features.VanishMode = false;
+                if (uPlayer.Features.GodMode)
+                    uPlayer.Features.GodMode = false;
                 Rocket.Core.Logging.Logger.Log("Ended protection for " + uPlayer.DisplayName, ConsoleColor.Cyan);
             }
-            ChatManager.say(base.Configuration.Instance.ProtectionEndMessage, base.Configuration.Instance.MessageColor);
+            ChatManager.say(Instance.Configuration.Instance.ProtectionEndMessage, Instance.Configuration.Instance.MessageColor);
 
             yield return new WaitForEndOfFrame();
         }
 
         private Coroutine PTCoroutine;
+
         public static SpawnProtection Instance;
 
         private bool ProtectedB = false;
