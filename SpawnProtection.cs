@@ -69,7 +69,7 @@ namespace ArenaSpawnProtection
         {
             for (int i = 0; i < Provider.clients.Count; i++)
             {
-                UnturnedPlayer uPlayer = (UnturnedPlayer)UnturnedPlayer.FromCSteamID(Provider.clients[i].playerID.steamID);
+                UnturnedPlayer uPlayer = UnturnedPlayer.FromCSteamID(Provider.clients[i].playerID.steamID);
                 if (!uPlayer.Features.VanishMode)
                     uPlayer.Features.VanishMode = true;
                 if (!uPlayer.Features.GodMode)
@@ -80,7 +80,7 @@ namespace ArenaSpawnProtection
             yield return new WaitForSeconds(Instance.Configuration.Instance.PlayerProtectionTime + 5f);
             for (int i = 0; i < Provider.clients.Count; i++)
             {
-                UnturnedPlayer uPlayer = (UnturnedPlayer)UnturnedPlayer.FromCSteamID(Provider.clients[i].playerID.steamID);
+                UnturnedPlayer uPlayer = UnturnedPlayer.FromCSteamID(Provider.clients[i].playerID.steamID);
                 if (uPlayer.Features.VanishMode)
                     uPlayer.Features.VanishMode = false;
                 if (uPlayer.Features.GodMode)
