@@ -13,8 +13,11 @@ namespace ArenaSpawnProtection
         protected override void Load()
         {
             Instance = this;
+            Vanish = Instance.Configuration.Instance.EnableVanish;
+            God = Instance.Configuration.Instance.EnableGod;
             Rocket.Core.Logging.Logger.Log("\n\n\rArenaSpawnProtection made by ic3w0lf", ConsoleColor.Green);
             Rocket.Core.Logging.Logger.Log(string.Format("\r\rPlayer Protection Time: {0} seconds\n\n", Instance.Configuration.Instance.PlayerProtectionTime), ConsoleColor.Green);
+            Rocket.Core.Logging.Logger.Log(string.Format("Protect with godmode {0}, protect with vanish {1}", God ? "on" : "off", Vanish ? "on" : "off"), ConsoleColor.Green);
             U.Events.OnPlayerConnected += ProtectPlayerConnected;
             StartCoroutine(CheckArenaState());
         }
@@ -70,9 +73,9 @@ namespace ArenaSpawnProtection
             for (int i = 0; i < Provider.clients.Count; i++)
             {
                 UnturnedPlayer uPlayer = UnturnedPlayer.FromCSteamID(Provider.clients[i].playerID.steamID);
-                if (!uPlayer.Features.VanishMode)
+                if (Vanish && !uPlayer.Features.VanishMode)
                     uPlayer.Features.VanishMode = true;
-                if (!uPlayer.Features.GodMode)
+                if (God && !uPlayer.Features.GodMode)
                     uPlayer.Features.GodMode = true;
                 Rocket.Core.Logging.Logger.Log("Protected " + uPlayer.DisplayName, ConsoleColor.Cyan);
             }
@@ -81,9 +84,9 @@ namespace ArenaSpawnProtection
             for (int i = 0; i < Provider.clients.Count; i++)
             {
                 UnturnedPlayer uPlayer = UnturnedPlayer.FromCSteamID(Provider.clients[i].playerID.steamID);
-                if (uPlayer.Features.VanishMode)
+                if (Vanish && uPlayer.Features.VanishMode)
                     uPlayer.Features.VanishMode = false;
-                if (uPlayer.Features.GodMode)
+                if (God && uPlayer.Features.GodMode)
                     uPlayer.Features.GodMode = false;
                 Rocket.Core.Logging.Logger.Log("Ended protection for " + uPlayer.DisplayName, ConsoleColor.Cyan);
             }
@@ -91,6 +94,10 @@ namespace ArenaSpawnProtection
 
             yield return new WaitForEndOfFrame();
         }
+
+        private bool God;
+
+        private bool Vanish;
 
         private Coroutine PTCoroutine;
 
